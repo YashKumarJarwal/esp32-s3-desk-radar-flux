@@ -6,7 +6,7 @@ static int pin = PIN_BUTTON;
 static bool last = false; static uint32_t tDown = 0, tUp = 0, tDeb = 0;
 static uint8_t clicks = 0; static bool longFired = false;
 static Btn injected = Btn::None;
-static const uint32_t DEBOUNCE = 30, DOUBLE_GAP = 320, LONG_MS = 1500;
+static const uint32_t DEBOUNCE = 30, DOUBLE_GAP = 500, LONG_MS = 1500;
 
 void inputBegin() { pin = S.buttonPin >= 0 ? S.buttonPin : PIN_BUTTON; pinMode(pin, INPUT_PULLUP); }
 void inputInject(Btn b) { injected = b; }
