@@ -1,0 +1,24 @@
+# toolchain / build output
+venv/
+firmware/.pio/
+dev/pup/node_modules/
+dev/pup/package-lock.json
+dev/ffprof/
+__pycache__/
+*.pyc
+
+# generated screenshots, logs and crash captures
+dev/*.png
+dev/*.log
+dev/*.txt
+backups/*.log
+backups/parts/
+backups/strings.txt
+backups/bootlog.txt
+backups/parttable.bin
+
+# the stock flash dump contains the WiFi password: keep it out of git (checksum file stays)
+backups/*.bin
+
+# generated from web/index.html by dev/embed_web.py
+firmware/include/web_index.h

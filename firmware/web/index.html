@@ -1,0 +1,208 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FLUX</title>
+<style>
+:root{--bg:#060a12;--bg2:#0b1220;--card:#0f1829;--line:#1d2b44;--text:#dbe7f5;--muted:#7f92b0;--accent:#2dd4bf;--accent2:#60a5fa;--warn:#fb7185;--ok:#34d399;--r:14px}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;color:var(--text);background:radial-gradient(900px 500px at 50% -10%,rgba(45,212,191,.14),transparent),var(--bg);min-height:100vh}
+header{position:sticky;top:0;z-index:5;backdrop-filter:blur(12px);background:rgba(6,10,18,.75);border-bottom:1px solid var(--line)}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+.top{display:flex;align-items:center;gap:12px;height:58px}
+.logo{font-weight:800;letter-spacing:.18em;font-size:18px;color:var(--accent)}
+.logo small{display:block;font-size:10px;letter-spacing:.3em;color:var(--muted);font-weight:600}
+.sp{flex:1}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:12px;color:var(--muted);white-space:nowrap}
+.chip b{color:var(--text);font-weight:600}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--warn)}.dot.ok{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+nav{display:flex;gap:4px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}nav::-webkit-scrollbar{display:none}
+nav button{flex:none;border:0;background:transparent;color:var(--muted);padding:8px 14px;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px}
+nav button.on{background:var(--card);color:var(--text);border:1px solid var(--line)}
+main{padding:18px 0 60px}
+section{display:none}section.on{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.025),transparent),var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.card h3{margin:0 0 10px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.card p.hint{margin:0 0 12px;color:var(--muted);font-size:13px}
+.f{display:grid;gap:10px}
+label{display:block;font-size:12px;color:var(--muted);font-weight:600;margin-bottom:4px}
+input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg2);color:var(--text);font-size:15px;outline:0}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,212,191,.15)}
+input[type=range]{padding:0;accent-color:var(--accent)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line)}.sw:last-child{border:0}
+.sw span{font-size:14px}.sw small{display:block;color:var(--muted);font-size:12px}
+.tg{position:relative;width:44px;height:26px;flex:none}.tg input{position:absolute;opacity:0;width:0;height:0}
+.tg i{position:absolute;inset:0;border-radius:999px;background:#213050;transition:.2s;cursor:pointer}
+.tg i:before{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.tg input:checked+i{background:var(--accent)}.tg input:checked+i:before{transform:translateX(18px)}
+button.b{padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:var(--bg2);color:var(--text);font-weight:600;cursor:pointer;font-size:14px}
+button.b.p{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04101a;border:0}
+button.b.d{color:var(--warn);border-color:rgba(251,113,133,.4)}
+button.b:disabled{opacity:.5}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.themes{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.th{border:2px solid var(--line);border-radius:12px;padding:10px;cursor:pointer;text-align:center;font-size:12px;font-weight:600}
+.th.on{border-color:var(--accent)}.th .sw1{height:34px;border-radius:8px;margin-bottom:6px;background:var(--c1);position:relative;overflow:hidden}
+.th .sw1:after{content:"";position:absolute;inset:6px;border-radius:50%;border:2px solid var(--c2);box-shadow:inset 0 0 0 6px var(--c1),0 0 12px var(--c3)}
+.screen{display:flex;flex-direction:column;align-items:center;gap:10px}
+canvas{width:240px;height:240px;border-radius:50%;box-shadow:0 0 0 6px #0b1220,0 0 0 7px var(--line),0 20px 60px rgba(0,0,0,.6);image-rendering:pixelated}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.st{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:8px 10px}.st b{display:block;font-size:17px}.st span{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.list{display:grid;gap:6px;max-height:260px;overflow:auto}
+.wi{display:flex;justify-content:space-between;padding:8px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:var(--bg2)}.wi small{color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+pre{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px;overflow:auto;font-size:12px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--card);border:1px solid var(--accent);padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none;z-index:9}
+.toast.on{opacity:1}
+.bar{height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;border:1px solid var(--line)}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:.2s}
+.save{position:fixed;right:16px;bottom:16px;z-index:8;display:none;box-shadow:0 10px 30px rgba(0,0,0,.5)}.save.on{display:block}
+.lang{font-size:12px;cursor:pointer;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:4px 8px;background:none}
+@media(max-width:560px){.row3{grid-template-columns:1fr 1fr}.top .chip.h{display:none}}
+</style></head><body>
+<header><div class="wrap"><div class="top">
+<div class="logo">FLUX<small data-i18n="tag">DESK ORB</small></div>
+<span class="chip h"><i class="dot" id="dNet"></i><b id="sIp">…</b></span>
+<span class="chip h"><i class="dot" id="dApi"></i><span id="sApi">API</span></span>
+<div class="sp"></div>
+<button class="lang" id="langBtn">中文</button>
+</div><nav id="nav"></nav></div></header>
+<main class="wrap">
+
+<section id="t-overview" class="on"><div class="grid">
+<div class="card screen"><h3 data-i18n="live">Live screen</h3><canvas id="cv" width="240" height="240"></canvas>
+<div class="acts"><button class="b" onclick="act('theme')" data-i18n="btTheme">Next theme</button><button class="b" onclick="act('range')" data-i18n="btRange">Next range</button><button class="b" onclick="act('refresh')" data-i18n="btRefresh">Fetch now</button><button class="b" onclick="act('qr')">QR</button></div>
+<div style="width:100%"><label data-i18n="mode">Display mode</label><select id="modeSel" onchange="act('mode',this.value)"></select></div></div>
+<div class="card"><h3 data-i18n="status">Status</h3><div class="stats" id="stats"></div>
+<h3 style="margin-top:16px" data-i18n="acft">Aircraft</h3><div style="overflow:auto"><table><thead><tr><th data-i18n="callsign">Callsign</th><th data-i18n="type">Type</th><th>Alt m</th><th>km/h</th><th>km</th></tr></thead><tbody id="acftTb"></tbody></table></div></div>
+</div></section>
+
+<section id="t-radar"><div class="grid">
+<div class="card"><h3 data-i18n="loc">Radar location</h3><p class="hint" data-i18n="locH">Centre of the radar. Use your phone's location or paste coordinates from a map.</p>
+<div class="f"><div class="row"><div><label data-i18n="lat">Latitude</label><input data-k="lat" type="number" step="0.00001"></div><div><label data-i18n="lon">Longitude</label><input data-k="lon" type="number" step="0.00001"></div></div>
+<div class="acts"><button class="b" onclick="geo()" data-i18n="useLoc">Use my location</button><a class="b" style="text-decoration:none" id="mapLink" target="_blank" data-i18n="openMap">Open in map</a></div><p class="hint" id="geoMsg"></p></div></div>
+<div class="card"><h3 data-i18n="range">Range</h3><p class="hint" data-i18n="rangeH">Three presets cycled by a double tap. Fetch range is the API query radius, clamped between display range and 1.5× (max 300 km).</p>
+<div class="f"><div class="row3"><div><label data-i18n="p1">Preset 1 km</label><input data-k="preset.0" type="number"></div><div><label data-i18n="p2">Preset 2 km</label><input data-k="preset.1" type="number"></div><div><label data-i18n="p3">Preset 3 km</label><input data-k="preset.2" type="number"></div></div>
+<div class="row"><div><label data-i18n="active">Active range km</label><input data-k="rangeKm" type="number"></div><div><label data-i18n="fetch">Fetch range km</label><input data-k="fetchKm" type="number"></div></div>
+<div class="sw"><span data-i18n="edge">Edge dots<small data-i18n="edgeH">Aircraft just outside the display range as rim dots</small></span><label class="tg"><input type="checkbox" data-k="edgeDots"><i></i></label></div>
+<div><label data-i18n="edgeExt">Edge extension km</label><input data-k="edgeExtKm" type="number" step="0.5"></div></div></div>
+<div class="card"><h3 data-i18n="symbols">Symbols & info</h3><div class="f">
+<div class="sw"><span data-i18n="labels">Aircraft labels<small data-i18n="labelsH">Callsign, type, speed and altitude next to each aircraft</small></span><label class="tg"><input type="checkbox" data-k="labels"><i></i></label></div>
+<div class="sw"><span data-i18n="trails">Position trails<small data-i18n="trailsH">Fading history of each track</small></span><label class="tg"><input type="checkbox" data-k="trails"><i></i></label></div>
+<div class="sw"><span data-i18n="lock">Lock-on card<small data-i18n="lockH">Reticle and details for the nearest airborne aircraft</small></span><label class="tg"><input type="checkbox" data-k="lockOn"><i></i></label></div>
+<div class="row"><div><label data-i18n="maxac">Max aircraft drawn</label><input data-k="maxAircraft" type="number" min="1" max="40"></div><div><label data-i18n="overhead">Overhead alert km</label><input data-k="overheadAlertKm" type="number" step="0.5"></div></div></div></div>
+<div class="card"><h3 data-i18n="filters">Filters</h3><p class="hint" data-i18n="filtersH">Hide ground, parked or very slow airport targets.</p><div class="f">
+<div class="sw"><span data-i18n="ground">Show ground traffic</span><label class="tg"><input type="checkbox" data-k="showGround"><i></i></label></div>
+<div class="row"><div><label data-i18n="minAlt">Min altitude m</label><input data-k="minAltM" type="number"></div><div><label data-i18n="minSpd">Min speed m/s</label><input data-k="minSpeedMs" type="number" step="0.5"></div></div></div></div>
+</div></section>
+
+<section id="t-display"><div class="grid">
+<div class="card"><h3 data-i18n="theme">Theme</h3><div class="themes" id="themes"></div></div>
+<div class="card"><h3 data-i18n="bright">Brightness</h3><div class="f"><div><label><span data-i18n="brightL">Brightness</span> <b id="brV"></b></label><input data-k="brightness" type="range" min="10" max="255" oninput="document.getElementById('brV').textContent=Math.round(this.value/2.55)+'%'"></div>
+<div class="sw"><span data-i18n="night">Night dimming<small data-i18n="nightH">Lower brightness outside the active schedule window</small></span><label class="tg"><input type="checkbox" data-k="autoDimNight"><i></i></label></div>
+<div><label data-i18n="nightB">Night brightness</label><input data-k="nightBrightness" type="range" min="5" max="255"></div></div></div>
+<div class="card"><h3 data-i18n="sched">Schedule</h3><p class="hint" data-i18n="schedH">Only fetch data and run the radar inside this window; outside it the idle screen shows.</p><div class="f">
+<div class="sw"><span data-i18n="schedOn">Enable schedule</span><label class="tg"><input type="checkbox" data-k="scheduleEnabled"><i></i></label></div>
+<div class="row"><div><label data-i18n="start">Start</label><input data-k="startMin" data-t="time" type="time"></div><div><label data-i18n="end">End</label><input data-k="endMin" data-t="time" type="time"></div></div>
+<div class="row"><div><label data-i18n="tz">Timezone offset</label><select data-k="tzMin" id="tzSel"></select></div><div><label data-i18n="idle">Idle screen</label><select data-k="idle"><option value="0" data-i18n="idleOff">Off (black)</option><option value="1" data-i18n="idleClock">Clock</option><option value="2" data-i18n="idleDim">Dimmed radar</option></select></div></div>
+<div class="acts"><button class="b" onclick="tzBrowser()" data-i18n="tzB">Use browser timezone</button></div></div></div>
+<div class="card"><h3 data-i18n="modes">Modes</h3><p class="hint" data-i18n="modesH">Enable the screens you want in the rotation.</p><div class="f" id="modesList"></div></div>
+</div></section>
+
+<section id="t-data"><div class="grid">
+<div class="card"><h3 data-i18n="src">Data source</h3><p class="hint" data-i18n="srcH">adsb.fi Open Data needs no login. OpenSky is used as a fallback, optionally with an account.</p><div class="f">
+<div><label data-i18n="provider">Primary provider</label><select data-k="provider" onchange="osFields()"><option value="0">adsb.fi Open Data</option><option value="1">OpenSky Network</option></select></div>
+<div><label data-i18n="acct">OpenSky account</label><select data-k="account" onchange="osFields()"><option value="0" data-i18n="anon">Anonymous</option><option value="1" data-i18n="withAcct">Use account / API client</option></select></div>
+<div id="osf" class="f"><div class="row"><div><label>OpenSky username</label><input data-k="osUser"></div><div><label>Password</label><input data-k="osPass" type="password"></div></div>
+<div class="row"><div><label>API client ID</label><input data-k="osClientId"></div><div><label>API client secret</label><input data-k="osClientSecret" type="password"></div></div></div></div></div>
+<div class="card"><h3 data-i18n="refresh">Refresh policy</h3><p class="hint" id="usage"></p><div class="f">
+<div><label data-i18n="policy">Policy</label><select data-k="refreshPolicy" oninput="usage()"><option value="1" data-i18n="manual">Manual interval</option><option value="0" data-i18n="auto">Auto by daily budget</option></select></div>
+<div class="row"><div><label data-i18n="manInt">Manual interval s</label><input data-k="manualIntervalMs" data-t="sec" type="number" oninput="usage()"></div><div><label data-i18n="minInt">Minimum interval s</label><input data-k="minIntervalMs" data-t="sec" type="number" oninput="usage()"></div></div>
+<div class="row3"><div><label data-i18n="budget">Daily budget</label><input data-k="dailyBudget" type="number" oninput="usage()"></div><div><label data-i18n="reserve">Reserve</label><input data-k="reserve" type="number" step="0.05" oninput="usage()"></div><div><label data-i18n="cost">Cost / request</label><input data-k="cost" type="number" step="0.1" oninput="usage()"></div></div></div></div>
+</div></section>
+
+<section id="t-wifi"><div class="grid">
+<div class="card"><h3>WiFi</h3><p class="hint" data-i18n="wifiH">Changes apply after a restart. Hold BOOT at power-on to force the setup hotspot.</p><div class="f">
+<div><label>SSID</label><input data-k="ssid" id="ssid"></div>
+<div><label data-i18n="pass">Password</label><div style="display:flex;gap:8px"><input data-k="wpass" id="wpass" type="password"><button class="b" type="button" onclick="var p=document.getElementById('wpass');p.type=p.type=='password'?'text':'password'">👁</button></div></div>
+<div><label data-i18n="host">Hostname (.local)</label><input data-k="hostname"></div>
+<div class="acts"><button class="b" onclick="scan()" data-i18n="scan">Scan networks</button><button class="b p" onclick="save(true)" data-i18n="saveReboot">Save & restart</button></div>
+<div class="list" id="wl"></div></div></div>
+</div></section>
+
+<section id="t-pulse"><div class="grid">
+<div class="card"><h3 data-i18n="pulse">Integrations (PULSE)</h3><p class="hint" data-i18n="pulseH">Anything on your computer can push a card to the orb: Claude Code sessions, GitHub counts, Spotify, CI, scripts. Cards can overlay a small badge on any screen or take over the display.</p>
+<div class="f"><div><label data-i18n="token">Push token (optional)</label><input data-k="pulseToken" placeholder="leave empty for open LAN access"></div></div>
+<pre id="curlEx"></pre><p class="hint" data-i18n="bridgeH">A ready-made bridge with plugins lives in ~/deskradar/bridge on your PC.</p></div>
+<div class="card"><h3 data-i18n="cards">Active cards</h3><div id="cards" class="list"></div></div>
+</div></section>
+
+<section id="t-adv"><div class="grid">
+<div class="card"><h3 data-i18n="pred">Motion prediction</h3><p class="hint" data-i18n="predH">Between API updates, aircraft are moved along their heading and smoothed towards each new fix.</p><div class="f">
+<div class="sw"><span data-i18n="predOn">Enable prediction</span><label class="tg"><input type="checkbox" data-k="prediction"><i></i></label></div>
+<div class="row3"><div><label data-i18n="alpha">Smoothing α</label><input data-k="alpha" type="number" step="0.01"></div><div><label data-i18n="predMax">Max predict s</label><input data-k="predMaxMs" data-t="sec" type="number"></div><div><label data-i18n="jump">Jump reset km</label><input data-k="jumpKm" type="number"></div></div>
+<div class="row"><div><label data-i18n="lowSpd">Low speed m/s</label><input data-k="lowSpeed" type="number"></div><div><label data-i18n="stale">Stale after s</label><input data-k="staleMs" data-t="sec" type="number"></div></div>
+<div class="sw"><span data-i18n="corr">Correction animation</span><label class="tg"><input type="checkbox" data-k="correction"><i></i></label></div>
+<div class="row3"><div><label data-i18n="corrMin">Min API gap s</label><input data-k="corrMinApiMs" data-t="sec" type="number"></div><div><label data-i18n="corrDur">Duration ms</label><input data-k="corrDurMs" type="number"></div><div><label data-i18n="corrStart">Start distance km</label><input data-k="corrStartKm" type="number" step="0.1"></div></div></div></div>
+<div class="card"><h3 data-i18n="hw">Hardware</h3><div class="f">
+<div class="row"><div><label data-i18n="btn">Button GPIO (-1 = BOOT)</label><input data-k="buttonPin" type="number"></div><div><label data-i18n="txp">WiFi TX power (raw, 76 = 19 dBm)</label><input data-k="txPowerRaw" type="number"></div></div>
+<div class="sw"><span data-i18n="dbg">Verbose serial debug</span><label class="tg"><input type="checkbox" data-k="serialDebug"><i></i></label></div></div></div>
+</div></section>
+
+<section id="t-sys"><div class="grid">
+<div class="card"><h3 data-i18n="fw">Firmware update</h3><p class="hint" data-i18n="fwH">Upload a firmware.bin. It is written to the spare slot; if the new build fails to boot, the previous one is restored automatically.</p>
+<div class="f"><input type="file" id="fw" accept=".bin"><div class="bar"><i id="fwBar"></i></div><div class="acts"><button class="b p" onclick="ota()" data-i18n="upload">Upload & restart</button><button class="b" onclick="post('/api/rollback').then(()=>toast('Rolling back…'))" data-i18n="rollback">Roll back to previous</button></div></div></div>
+<div class="card"><h3 data-i18n="sys">System</h3><div class="stats" id="sys"></div>
+<div class="acts"><button class="b" onclick="post('/api/restart').then(()=>toast('Restarting'))" data-i18n="restart">Restart</button><button class="b" onclick="exportJ()" data-i18n="export">Export settings</button><label class="b" style="cursor:pointer"><span data-i18n="import">Import settings</span><input type="file" id="imp" accept=".json" style="display:none" onchange="importJ(this)"></label><button class="b d" onclick="if(confirm(T('confirmReset')))post('/api/reset').then(()=>toast('Reset'))" data-i18n="reset">Factory reset</button></div></div>
+</div></section>
+</main>
+<button class="b p save" id="saveBtn" onclick="save(false)" data-i18n="save">Save changes</button>
+<div class="toast" id="toast"></div>
+<script>
+const I18N={en:{tag:"DESK ORB",live:"Live screen",btTheme:"Next theme",btRange:"Next range",btRefresh:"Fetch now",mode:"Display mode",status:"Status",acft:"Aircraft",callsign:"Callsign",type:"Type",loc:"Radar location",locH:"Centre of the radar. Use your phone's location or paste coordinates from a map.",lat:"Latitude",lon:"Longitude",useLoc:"Use my location",openMap:"Open in map",range:"Range",rangeH:"Three presets cycled by a double tap. Fetch range is the API query radius, clamped between display range and 1.5× (max 300 km).",p1:"Preset 1 km",p2:"Preset 2 km",p3:"Preset 3 km",active:"Active range km",fetch:"Fetch range km",edge:"Edge dots",edgeH:"Aircraft just outside the display range as rim dots",edgeExt:"Edge extension km",symbols:"Symbols & info",labels:"Aircraft labels",labelsH:"Callsign, type, speed and altitude next to each aircraft",trails:"Position trails",trailsH:"Fading history of each track",lock:"Lock-on card",lockH:"Reticle and details for the nearest airborne aircraft",maxac:"Max aircraft drawn",overhead:"Overhead alert km",filters:"Filters",filtersH:"Hide ground, parked or very slow airport targets.",ground:"Show ground traffic",minAlt:"Min altitude m",minSpd:"Min speed m/s",theme:"Theme",bright:"Brightness",brightL:"Brightness",night:"Night dimming",nightH:"Lower brightness outside the active schedule window",nightB:"Night brightness",sched:"Schedule",schedH:"Only fetch data and run the radar inside this window; outside it the idle screen shows.",schedOn:"Enable schedule",start:"Start",end:"End",tz:"Timezone offset",idle:"Idle screen",idleOff:"Off (black)",idleClock:"Clock",idleDim:"Dimmed radar",tzB:"Use browser timezone",modes:"Modes",modesH:"Enable the screens you want in the rotation.",src:"Data source",srcH:"adsb.fi Open Data needs no login. OpenSky is used as a fallback, optionally with an account.",provider:"Primary provider",acct:"OpenSky account",anon:"Anonymous",withAcct:"Use account / API client",refresh:"Refresh policy",policy:"Policy",manual:"Manual interval",auto:"Auto by daily budget",manInt:"Manual interval s",minInt:"Minimum interval s",budget:"Daily budget",reserve:"Reserve",cost:"Cost / request",wifiH:"Changes apply after a restart. Hold BOOT at power-on to force the setup hotspot.",pass:"Password",host:"Hostname (.local)",scan:"Scan networks",saveReboot:"Save & restart",pulse:"Integrations (PULSE)",pulseH:"Anything on your computer can push a card to the orb: Claude Code sessions, GitHub counts, Spotify, CI, scripts. Cards can overlay a small badge on any screen or take over the display.",token:"Push token (optional)",bridgeH:"A ready-made bridge with plugins lives in ~/deskradar/bridge on your PC.",cards:"Active cards",pred:"Motion prediction",predH:"Between API updates, aircraft are moved along their heading and smoothed towards each new fix.",predOn:"Enable prediction",alpha:"Smoothing α",predMax:"Max predict s",jump:"Jump reset km",lowSpd:"Low speed m/s",stale:"Stale after s",corr:"Correction animation",corrMin:"Min API gap s",corrDur:"Duration ms",corrStart:"Start distance km",hw:"Hardware",btn:"Button GPIO (-1 = BOOT)",txp:"WiFi TX power (raw, 76 = 19 dBm)",dbg:"Verbose serial debug",fw:"Firmware update",fwH:"Upload a firmware.bin. It is written to the spare slot; if the new build fails to boot, the previous one is restored automatically.",upload:"Upload & restart",rollback:"Roll back to previous",sys:"System",restart:"Restart",export:"Export settings",import:"Import settings",reset:"Factory reset",save:"Save changes",saved:"Saved",confirmReset:"Reset all settings to defaults?",tabs:["Overview","Radar","Display","Data","WiFi","Integrations","Advanced","System"],usage:(n,i)=>`≈ ${n} requests/day at one every ${i} s`},
+zh:{tag:"桌面雷达球",live:"实时屏幕",btTheme:"下一个主题",btRange:"切换范围",btRefresh:"立即获取",mode:"显示模式",status:"状态",acft:"飞机",callsign:"航班号",type:"机型",loc:"雷达位置",locH:"雷达中心。可使用手机当前位置或从地图粘贴坐标。",lat:"纬度",lon:"经度",useLoc:"使用我的位置",openMap:"在地图中打开",range:"显示范围",rangeH:"三个档位，双击按键切换。获取范围是 API 查询半径，限制在显示范围到 1.5 倍之间（最大 300 km）。",p1:"档位 1 km",p2:"档位 2 km",p3:"档位 3 km",active:"当前范围 km",fetch:"获取范围 km",edge:"边缘点",edgeH:"显示范围外的飞机以边缘点显示",edgeExt:"边缘扩展 km",symbols:"图标与信息",labels:"飞机信息",labelsH:"在飞机旁显示航班号、机型、速度和高度",trails:"航迹",trailsH:"每个目标的渐隐历史轨迹",lock:"锁定卡片",lockH:"最近空中目标的准星与详情",maxac:"最大显示飞机数",overhead:"头顶提醒 km",filters:"过滤",filtersH:"隐藏地面、停机或低速目标。",ground:"显示地面目标",minAlt:"最小高度 m",minSpd:"最小速度 m/s",theme:"主题",bright:"亮度",brightL:"显示亮度",night:"夜间调暗",nightH:"在计划时间之外降低亮度",nightB:"夜间亮度",sched:"计划",schedH:"仅在此时间段内获取数据并运行雷达，其他时间显示待机画面。",schedOn:"启用计划",start:"开始",end:"结束",tz:"时区偏移",idle:"待机画面",idleOff:"关闭（黑屏）",idleClock:"时钟",idleDim:"调暗雷达",tzB:"使用浏览器时区",modes:"模式",modesH:"选择要轮换显示的画面。",src:"数据源",srcH:"adsb.fi Open Data 无需登录。OpenSky 作为备用数据源，可选账号。",provider:"主数据源",acct:"OpenSky 账号",anon:"匿名",withAcct:"使用账号 / API 客户端",refresh:"更新策略",policy:"策略",manual:"手动间隔",auto:"按每日额度自动",manInt:"手动间隔 秒",minInt:"最小间隔 秒",budget:"每日额度",reserve:"预留比例",cost:"每次请求成本",wifiH:"修改后需重启生效。开机时按住 BOOT 可强制进入配置热点。",pass:"密码",host:"主机名 (.local)",scan:"扫描网络",saveReboot:"保存并重启",pulse:"集成 (PULSE)",pulseH:"电脑上的任何东西都可以向设备推送卡片：Claude Code 会话、GitHub 数量、Spotify、CI、脚本。卡片可作为小徽章叠加在任意画面上，或接管整个屏幕。",token:"推送令牌（可选）",bridgeH:"电脑上的 ~/deskradar/bridge 内有现成的桥接程序和插件。",cards:"当前卡片",pred:"位置预测",predH:"在两次 API 更新之间，飞机沿航向推算并平滑过渡到新位置。",predOn:"启用预测",alpha:"平滑系数 α",predMax:"最大预测 秒",jump:"跳变重置 km",lowSpd:"低速阈值 m/s",stale:"过期时间 秒",corr:"修正动画",corrMin:"最小 API 间隔 秒",corrDur:"动画时长 ms",corrStart:"起始距离 km",hw:"硬件",btn:"按键 GPIO（-1 = BOOT）",txp:"WiFi 发射功率（原始值，76 = 19 dBm）",dbg:"串口详细调试",fw:"固件更新",fwH:"上传 firmware.bin。写入备用分区；如果新固件无法启动，将自动恢复上一版本。",upload:"上传并重启",rollback:"回滚到上一版本",sys:"系统",restart:"重启",export:"导出设置",import:"导入设置",reset:"恢复出厂设置",save:"保存更改",saved:"已保存",confirmReset:"确定将所有设置恢复为默认？",tabs:["概览","雷达","显示","数据","WiFi","集成","高级","系统"],usage:(n,i)=>`≈ 每天 ${n} 次请求，每 ${i} 秒一次`}};
+let lang=localStorage.getItem('lang')||'en',S={},ST={},dirty=false;
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+function T(k){return I18N[lang][k]??I18N.en[k]??k}
+function i18n(){document.documentElement.lang=lang;$$('[data-i18n]').forEach(e=>{const v=T(e.dataset.i18n);if(typeof v=='string')e.textContent=v});$('#langBtn').textContent=lang=='en'?'中文':'EN';
+const tabs=T('tabs');$$('#nav button').forEach((b,i)=>b.textContent=tabs[i]);usage()}
+const TABS=['overview','radar','display','data','wifi','pulse','adv','sys'];
+TABS.forEach((t,i)=>{const b=document.createElement('button');b.onclick=()=>show(t);b.className=i==0?'on':'';$('#nav').appendChild(b)});
+function show(t){$$('section').forEach(s=>s.classList.toggle('on',s.id=='t-'+t));$$('#nav button').forEach((b,i)=>b.classList.toggle('on',TABS[i]==t));location.hash=t}
+$('#langBtn').onclick=()=>{lang=lang=='en'?'zh':'en';localStorage.setItem('lang',lang);i18n();post('/api/settings',{lang:lang=='zh'?1:0})};
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)}
+async function get(u){return (await fetch(u)).json()}
+async function post(u,b){return fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:b?JSON.stringify(b):''})}
+async function act(a,v){await post('/api/action',{action:a,value:v});toast(a)}
+const THEMES=[["PlaneRadar","#020a14","#00e6c8","#ff3c3c"],["Classic","#000a00","#3cff3c","#b4ffb4"],["Cyberpunk","#0e0014","#ff00c8","#ffe600"],["Neon","#020208","#5aa0ff","#ffffff"]];
+THEMES.forEach((t,i)=>{const d=document.createElement('div');d.className='th';d.style=`--c1:${t[1]};--c2:${t[2]};--c3:${t[3]}`;d.innerHTML=`<div class="sw1"></div>${t[0]}`;d.onclick=()=>{setVal('theme',i);$$('.th').forEach((e,j)=>e.classList.toggle('on',j==i));mark()};$('#themes').appendChild(d)});
+for(let o=-720;o<=840;o+=30){const e=document.createElement('option');e.value=o;e.textContent='UTC'+(o>=0?'+':'-')+String(Math.floor(Math.abs(o)/60)).padStart(2,'0')+':'+String(Math.abs(o)%60).padStart(2,'0');$('#tzSel').appendChild(e)}
+function tzBrowser(){setVal('tzMin',-new Date().getTimezoneOffset());mark()}
+function getVal(k){return k.includes('.')?S[k.split('.')[0]][+k.split('.')[1]]:S[k]}
+function setVal(k,v){if(k.includes('.')){const [a,b]=k.split('.');(S[a]=S[a]||[])[+b]=v}else S[k]=v}
+function fill(){$$('[data-k]').forEach(e=>{const k=e.dataset.k;let v=getVal(k);if(v===undefined)return;if(e.type=='checkbox')e.checked=!!v;else if(e.dataset.t=='time')e.value=String(Math.floor(v/60)).padStart(2,'0')+':'+String(v%60).padStart(2,'0');else if(e.dataset.t=='sec')e.value=v/1000;else e.value=v});
+$$('.th').forEach((e,j)=>e.classList.toggle('on',j==S.theme));$('#brV').textContent=Math.round(S.brightness/2.55)+'%';$('#mapLink').href=`https://www.openstreetmap.org/?mlat=${S.lat}&mlon=${S.lon}#map=11/${S.lat}/${S.lon}`;
+osFields();usage();modesUI();curl();dirty=false;$('#saveBtn').classList.remove('on')}
+function collect(){$$('[data-k]').forEach(e=>{const k=e.dataset.k;let v;if(e.type=='checkbox')v=e.checked;else if(e.dataset.t=='time'){const[h,m]=e.value.split(':');v=(+h)*60+(+m)}else if(e.dataset.t=='sec')v=Math.round(+e.value*1000);else if(e.type=='number'||e.type=='range'||e.tagName=='SELECT'&&!isNaN(e.value))v=+e.value;else v=e.value;setVal(k,v)})}
+function mark(){dirty=true;$('#saveBtn').classList.add('on')}
+document.addEventListener('input',e=>{if(e.target.dataset.k)mark()});
+async function save(reboot){collect();const r=await post('/api/settings',S);if(!r.ok){toast('Error');return}toast(T('saved'));dirty=false;$('#saveBtn').classList.remove('on');if(reboot){await post('/api/restart');toast('Restarting…')}}
+function osFields(){$('#osf').style.display=$('[data-k=account]').value=='1'?'grid':'none'}
+function usage(){if(!S||S.preset===undefined)return;collect();let iv=S.refreshPolicy==1?Math.max(S.manualIntervalMs,S.minIntervalMs)/1000:Math.max(S.minIntervalMs/1000,86400/Math.max(1,S.dailyBudget*S.reserve/Math.max(.01,S.cost)));if(!iv||!isFinite(iv))return;$('#usage').textContent=T('usage')(Math.round(86400/iv),Math.round(iv))}
+function modesUI(){const m=ST.modes||[];$('#modesList').innerHTML=m.map((n,i)=>`<div class="sw"><span>${n}</span><label class="tg"><input type="checkbox" ${(S.modesEnabled>>i)&1?'checked':''} onchange="S.modesEnabled^=(1<<${i});mark()"><i></i></label></div>`).join('');$('#modeSel').innerHTML=m.map((n,i)=>`<option value="${i}" ${ST.mode==i?'selected':''}>${n}</option>`).join('')}
+function curl(){$('#curlEx').textContent=`curl -X POST http://${location.host}/api/pulse \\\n  -H 'Content-Type: application/json'${S.pulseToken?" -H 'X-Token: "+S.pulseToken+"'":''} \\\n  -d '{"id":"claude","icon":"ai","title":"Claude","text":"thinking","style":"pulse","color":"#2dd4bf","overlay":true,"ttl":60}'`}
+async function geo(){const m=$('#geoMsg');if(!navigator.geolocation){m.textContent='No geolocation';return}if(!window.isSecureContext){m.textContent='Browsers only allow location on https. Open a map, long-press your spot and paste the coordinates.';return}m.textContent='…';navigator.geolocation.getCurrentPosition(p=>{setVal('lat',+p.coords.latitude.toFixed(5));setVal('lon',+p.coords.longitude.toFixed(5));fill();mark();m.textContent='±'+Math.round(p.coords.accuracy)+' m'},e=>m.textContent=e.message,{enableHighAccuracy:true,timeout:12000})}
+async function scan(){$('#wl').innerHTML='<div class="wi">…</div>';const r=await get('/api/wifi/scan');$('#wl').innerHTML=r.networks.map(n=>`<div class="wi" onclick="$('#ssid').value='${n.ssid.replace(/'/g,"\\'")}';mark()"><span>${n.ssid}</span><small>${n.rssi} dBm ${n.open?'· open':'🔒'}</small></div>`).join('')}
+function exportJ(){collect();const a=document.createElement('a');a.href='data:application/json,'+encodeURIComponent(JSON.stringify(S,null,2));a.download='flux-settings.json';a.click()}
+async function importJ(i){const t=await i.files[0].text();S=Object.assign(S,JSON.parse(t));fill();mark()}
+async function ota(){const f=$('#fw').files[0];if(!f){toast('Choose firmware.bin');return}const x=new XMLHttpRequest();x.open('POST','/api/ota');x.upload.onprogress=e=>$('#fwBar').style.width=(e.loaded/e.total*100)+'%';x.onload=()=>toast(x.status==200?'Flashed, restarting':'Failed: '+x.responseText);const fd=new FormData();fd.append('firmware',f);x.send(fd)}
+function stat(id,arr){document.getElementById(id).innerHTML=arr.map(([l,v])=>`<div class="st"><b>${v}</b><span>${l}</span></div>`).join('')}
+async function refresh(){try{ST=await get('/api/status');$('#sIp').textContent=ST.ip;$('#dNet').className='dot'+(ST.state==2?' ok':'');$('#dApi').className='dot'+(ST.api.status==1?' ok':'');$('#sApi').textContent=ST.api.provider+' '+(ST.api.status==1?'OK':ST.api.err||'…');
+stat('stats',[['mode',ST.modeName],['theme',ST.themeName],['range',ST.rangeKm+' km'],['aircraft',ST.api.active],['interval',ST.api.interval/1000+' s'],['requests today',ST.api.today],['RSSI',ST.rssi+' dBm'],['uptime',fmtUp(ST.uptime)]]);
+stat('sys',[['version',ST.version],['free heap',(ST.heap/1024).toFixed(0)+' k'],['free PSRAM',(ST.psram/1024).toFixed(0)+' k'],['slot',ST.slot],['chip',ST.chip],['build',ST.build]]);
+if(!$('#modeSel').options.length||ST.modes.length!=$('#modeSel').options.length)modesUI();$('#modeSel').value=ST.mode;
+const ac=await get('/api/aircraft');$('#acftTb').innerHTML=ac.aircraft.map(a=>`<tr><td>${a.cs}</td><td>${a.t}</td><td>${a.alt}</td><td>${a.spd}</td><td>${a.dist}</td></tr>`).join('');
+$('#cards').innerHTML=(ST.cards||[]).map(c=>`<div class="wi"><span>${c.icon} ${c.title}: ${c.text}</span><small>${c.ttl}s</small></div>`).join('')||'<small style="color:var(--muted)">—</small>'}catch(e){}}
+function fmtUp(s){return s>3600?(s/3600).toFixed(1)+' h':Math.round(s/60)+' min'}
+async function screen(){try{const b=new Uint8Array(await (await fetch('/screen.raw')).arrayBuffer());const c=$('#cv').getContext('2d');const im=c.createImageData(240,240);for(let i=0,j=0;i<b.length;i+=2,j+=4){const v=(b[i]<<8)|b[i+1];im.data[j]=(v>>11)*255/31;im.data[j+1]=((v>>5)&63)*255/63;im.data[j+2]=(v&31)*255/31;im.data[j+3]=255}c.putImageData(im,0,0)}catch(e){}}
+(async()=>{i18n();if(location.hash)show(location.hash.slice(1));try{S=await get('/api/settings');if(S.lang!==undefined&&!localStorage.getItem('lang')){lang=S.lang?'zh':'en';i18n()}await refresh();fill()}catch(e){toast('Device offline, retrying…');setTimeout(()=>location.reload(),4000);return}setInterval(refresh,3000);setInterval(screen,700);screen()})();
+window.onbeforeunload=()=>dirty?'':null;
+</script></body></html>

@@ -1,0 +1,12 @@
+{
+  "device": "http://192.168.1.26",
+  "fallback_device": "http://flux.local",
+  "token": "",
+  "interval": 5,
+  "plugins": {
+    "spotify": {"enabled": true, "takeover_on_change": 12, "art": true},
+    "github": {"enabled": false, "token_env": "GITHUB_TOKEN", "token_file": "~/.config/flux-bridge/github_token", "interval": 120},
+    "system": {"enabled": false, "interval": 10},
+    "command": {"enabled": false, "interval": 60, "cmd": "echo '{\"id\":\"custom\",\"icon\":\"dot\",\"title\":\"Custom\",\"text\":\"hello\"}'"}
+  }
+}
