@@ -67,11 +67,11 @@ void drawPulseCard(PulseCard& c, bool full) {
     frame.setFont(&fonts::Font0); frame.setTextColor(T.labelDim);
     frame.drawString(clockSynced() ? clockHHMM() : "", 120, 208);
   } else {
-    // compact badge, top-left arc area of the round screen
-    int x = 52, y = 52;
-    frame.fillCircle(x, y, 20, cLerp(T.bg, c.color, 40)); frame.drawCircle(x, y, 20, cLerp(T.bg, c.color, 140));
-    icon(c.icon, x, y, 11, c.color, anim, c.style);
-    if (c.progress >= 0) progressRing(x, y, 22, c.progress, c.color, cLerp(T.bg, c.color, 60));
+    // compact badge, tucked into the top-left rim of the round screen
+    int x = 44, y = 44;
+    frame.fillCircle(x, y, 12, cLerp(T.bg, c.color, 40)); frame.drawCircle(x, y, 12, cLerp(T.bg, c.color, 140));
+    icon(c.icon, x, y, 6, c.color, anim, c.style);
+    if (c.progress >= 0) progressRing(x, y, 14, c.progress, c.color, cLerp(T.bg, c.color, 60));
   }
 }
 
@@ -80,9 +80,9 @@ void drawPulseOverlay() {
   PulseCard* cs = pulseCards(); int n = 0;
   for (int i = 0; i < PULSE_MAX; i++) if (cs[i].used && cs[i].overlay) {
     // stack badges along the top-left rim
-    PulseCard& c = cs[i]; int x = 52 + n * 40, y = 52 - n * 14;
+    PulseCard& c = cs[i]; int x = 44 + n * 26, y = 44 - n * 12;
     if (n == 0) drawPulseCard(c, false);
-    else { frame.fillCircle(x, y, 12, cLerp(themeGet(S.theme).bg, c.color, 40)); icon(c.icon, x, y, 7, c.color, anim, c.style); }
+    else { frame.fillCircle(x, y, 8, cLerp(themeGet(S.theme).bg, c.color, 40)); icon(c.icon, x, y, 4, c.color, anim, c.style); }
     if (++n >= 3) break;
   }
 }

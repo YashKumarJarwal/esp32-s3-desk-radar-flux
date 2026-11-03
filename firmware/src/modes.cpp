@@ -3,6 +3,8 @@
 #include "pulse_ui.h"
 #include "modes_extra.h"
 #include "sigradar.h"
+#include "flight.h"
+#include "geo.h"
 #include "pulse.h"
 #include "display.h"
 #include "settings.h"
@@ -16,7 +18,7 @@ static Mode* modes[MODE_COUNT] = {nullptr};
 static uint8_t cur = MODE_SKY, nextMode = 255; static uint32_t transStart = 0;
 static bool qrOn = false; static String toast; static uint32_t toastUntil = 0;
 static uint32_t lastTick = 0;
-static const char* NAMES[MODE_COUNT] = {"SKY", "CHRONO", "ATMOS", "ORBIT", "SIGNAL", "PULSE"};
+static const char* NAMES[MODE_COUNT] = {"SKY", "FLIGHT", "CHRONO", "ATMOS", "ORBIT", "SIGNAL", "PULSE"};
 const char* modeName(uint8_t id) { return id < MODE_COUNT ? NAMES[id] : "?"; }
 uint8_t modeCurrent() { return cur; }
 void overlayQR(bool on) { qrOn = on; }
@@ -26,7 +28,7 @@ void overlayToast(const String& s, uint32_t ms) { toast = s; toastUntil = millis
 void modesBegin() {
   modes[MODE_SKY] = &skyMode;
   modes[MODE_PULSE] = &pulseMode;
-  modes[MODE_CHRONO] = &chronoMode; modes[MODE_ATMOS] = &atmosMode; modes[MODE_ORBIT] = &orbitMode; modes[MODE_SIGNAL] = &signalMode;
+  modes[MODE_FLIGHT] = &flightMode; modes[MODE_CHRONO] = &chronoMode; modes[MODE_ATMOS] = &atmosMode; modes[MODE_ORBIT] = &orbitMode; modes[MODE_SIGNAL] = &signalMode;
   cur = S.mode < MODE_COUNT && modes[S.mode] ? S.mode : MODE_SKY;
   modes[cur]->enter();
 }
@@ -103,7 +105,7 @@ void modesLoop() {
     if (n != cur) { modeSwitch(n); overlayToast(modeName(n)); }
   }
   else if (b != Btn::None) { modes[cur]->onButton(b); }
-  adsbLoop();
+  geoLoop(); adsbLoop();
   modes[cur]->update(now, dt);
   bool booting = (netState() == NetState::Connecting || netState() == NetState::Idle) && now < 40000;
   if (booting || netState() == NetState::PortalAP) drawConnectScreen();

@@ -1,6 +1,7 @@
 #include "auxdata.h"
 #include "settings.h"
 #include "net.h"
+#include "modes.h"
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
@@ -81,6 +82,7 @@ static void fetchRoute() {
     JsonObject fr = d["response"]["flightroute"];
     strlcpy(r.airline, fr["airline"]["name"] | "", sizeof r.airline); strlcpy(r.from, fr["origin"]["iata_code"] | "", sizeof r.from); strlcpy(r.to, fr["destination"]["iata_code"] | "", sizeof r.to);
     strlcpy(r.fromCity, fr["origin"]["municipality"] | "", sizeof r.fromCity); strlcpy(r.toCity, fr["destination"]["municipality"] | "", sizeof r.toCity);
+    r.fromLat = fr["origin"]["latitude"] | 0.0; r.fromLon = fr["origin"]["longitude"] | 0.0; r.toLat = fr["destination"]["latitude"] | 0.0; r.toLon = fr["destination"]["longitude"] | 0.0;
     if (S.serialDebug) Serial.printf("[aux] route %s: %s %s-%s\n", cs, r.airline, r.from, r.to);
   }
   pendingRoute[0] = 0;
@@ -92,7 +94,7 @@ static void task(void*) {
     vTaskDelay(pdMS_TO_TICKS(500));
     if (!netOnline()) continue;
     uint32_t now = millis();
-    bool wantW = ((S.modesEnabled >> 2) & 1), wantI = ((S.modesEnabled >> 3) & 1);
+    bool wantW = ((S.modesEnabled >> MODE_ATMOS) & 1), wantI = ((S.modesEnabled >> MODE_ORBIT) & 1);
     if (wantW && (now - tW > 15 * 60000UL || !W.valid) && (tW == 0 || now - tW > 60000)) { tW = now; fetchWeather(); }
     if (wantI && now - tI > 10000) { tI = now; fetchIss(); }
     if (pendingRoute[0]) fetchRoute();

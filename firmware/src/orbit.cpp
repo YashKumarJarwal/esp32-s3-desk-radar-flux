@@ -4,6 +4,7 @@
 #include "theme.h"
 #include "auxdata.h"
 #include "clock.h"
+#include "geo.h"
 OrbitMode orbitMode;
 static float anim = 0;
 void OrbitMode::update(uint32_t, float dt) { anim += dt; }
@@ -22,6 +23,7 @@ void OrbitMode::draw() {
   frame.drawCircle(CX, CY, R, T.ring);
   for (int lat = -60; lat <= 60; lat += 30) { float px = -1, py = -1; for (int lon = -180; lon <= 180; lon += 6) { float x, y; bool v = proj(lat, lon, S.lat, S.lon, R, x, y); if (v && px >= 0) frame.drawLine(px, py, x, y, T.ringDim); px = v ? x : -1; py = y; } }
   for (int lon = -180; lon < 180; lon += 30) { float px = -1, py = -1; for (int lat = -90; lat <= 90; lat += 6) { float x, y; bool v = proj(lat, lon, S.lat, S.lon, R, x, y); if (v && px >= 0) frame.drawLine(px, py, x, y, T.ringDim); px = v ? x : -1; py = y; } }
+  geoDrawCoast(CX, CY, R, S.lat, S.lon, cLerp(T.bg, T.ring, 170));
   frame.fillCircle(CX, CY, 3, T.accent); // observer at centre
   frame.setTextDatum(textdatum_t::middle_center); frame.setFont(&fonts::Font0);
   if (!I.valid) { frame.setTextColor(T.labelDim); frame.drawString("locating ISS...", CX, CY + 110); return; }

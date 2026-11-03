@@ -16,7 +16,8 @@ keeping every stock feature and adding modes, a modern bilingual dashboard, OTA,
 ## Device
 - Dashboard: http://192.168.1.26/ (or http://flux.local/) — Overview, Radar, Display, Data, WiFi, Integrations, Advanced, System
 - Button: short = next theme · double = next range · triple = next mode · long = settings QR · hold at power-on = setup hotspot
-- Modes: SKY (ADS-B radar) · CHRONO (orbital clock) · ATMOS (weather + AQI) · ORBIT (ISS) · SIGNAL (BLE/WiFi radar) · PULSE (integration cards)
+- Modes: SKY (ADS-B radar with runways, arrival/departure chevrons, lock-on with route + closest approach) · FLIGHT (one aircraft: route arc on a zoomed coastline globe, big figures, altitude trace; short = next aircraft, double = page) · CHRONO (orbital clock) · ATMOS (weather + AQI) · ORBIT (ISS on a coastline globe) · SIGNAL (BLE/WiFi radar) · PULSE (integration cards)
+- Geo data: 2,911 airports / 4,165 runways (OurAirports) and Natural Earth 110m coastlines compiled into flash by `dev/gen_geodata.py` (inputs in `dev/geodata/`, not committed)
 - Serial 115200: `h` for debug commands (`u` theme, `r` range, `n` next mode, `a` API status, `p` settings, `b` reboot, `1-4` virtual presses)
 
 ## Push API (PULSE)

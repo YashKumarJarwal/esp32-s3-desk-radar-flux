@@ -6,6 +6,7 @@
 #include "clock.h"
 #include "net.h"
 #include "auxdata.h"
+#include "geo.h"
 
 SkyMode skyMode;
 static float sweep = 0;           // degrees
@@ -100,6 +101,7 @@ void SkyMode::draw() {
   for (int k = 0; k < MAX_TRACKS; k++) if (tr[k].valid) order[n++] = k;
   for (int i = 1; i < n; i++) { int v = order[i], j = i - 1; while (j >= 0 && tr[order[j]].distKm > tr[v].distKm) { order[j + 1] = order[j]; j--; } order[j + 1] = v; }
   float ext = min(S.edgeExtKm, min(S.rangeKm * 0.5f, 300 - S.rangeKm));
+  if (S.rangeKm <= 80) geoDrawRunways(toXY, T.accent, T.labelDim, S.rangeKm <= 40);
   int shown = 0, edge = 0; int nearest = -1;
   struct Box { int x0, y0, x1, y1; }; Box boxes[MAX_TRACKS]; int nb = 0;
   auto free = [&](int x0, int y0, int x1, int y1) { for (int q = 0; q < nb; q++) if (x0 < boxes[q].x1 && x1 > boxes[q].x0 && y0 < boxes[q].y1 && y1 > boxes[q].y0) return false; return true; };
@@ -122,10 +124,11 @@ void SkyMode::draw() {
       float x, y; toXY(t.dLat, t.dLon, x, y);
       uint16_t col = t.onGround ? T.labelDim : (t.altM > 9000 ? T.aircraftAlt : T.aircraft);
       // speed vector = 90 s of travel
-      float vKm = t.speedMs * 90 / 1000.0f * R / S.rangeKm; if (vKm > 2 && !t.onGround)
+      float vKm = min(t.speedMs * 60 / 1000.0f * R / S.rangeKm, 28.0f); if (vKm > 2 && !t.onGround)
         frame.drawLine(x, y, x + sinf(t.headingDeg * DEG_TO_RAD) * vKm, y - cosf(t.headingDeg * DEG_TO_RAD) * vKm, T.vector);
       drawPlane(x, y, t.headingDeg, col, 5.5f);
-      if (S.labels && free(x - 24, y - 16, x + 24, y + 26)) {
+      if (t.phase) { uint16_t pc = t.phase == 1 ? T.warn : T.accent; int bx = x + 8, by = y - 8; if (t.phase == 1) { frame.drawLine(bx - 3, by - 2, bx, by + 1, pc); frame.drawLine(bx, by + 1, bx + 3, by - 2, pc); } else { frame.drawLine(bx - 3, by + 1, bx, by - 2, pc); frame.drawLine(bx, by - 2, bx + 3, by + 1, pc); } }
+      if (S.labels && shown < 8 && free(x - 24, y - 16, x + 24, y + 26)) {
         boxes[nb++] = {(int)x - 24, (int)y - 16, (int)x + 24, (int)y + 26};
         frame.setFont(&fonts::Font0); frame.setTextDatum(textdatum_t::bottom_center); frame.setTextColor(T.label);
         frame.drawString(t.callsign, x, y - 8);
@@ -153,8 +156,10 @@ void SkyMode::draw() {
     char b[40]; snprintf(b, sizeof b, "%s  %.1f KM  %d KM/H", t.callsign, t.distKm, (int)(t.speedMs * 3.6f)); frame.drawString(b, CX, 186);
     const RouteInfo* ri = auxRoute(t.callsign);
     frame.setTextColor(T.labelDim);
-    if (ri && ri->from[0]) snprintf(b, sizeof b, "%s %s>%s", ri->airline[0] ? ri->airline : t.type, ri->from, ri->to);
-    else snprintf(b, sizeof b, "%s %s", t.type, t.desc[0] ? t.desc : t.reg);
+    float tm, dm; bool appr = adsbClosestApproach(t, tm, dm);
+    char cpa[20]; if (appr) snprintf(cpa, sizeof cpa, "%.1fKM IN %d:%02d", dm, (int)tm / 60, (int)tm % 60); else strcpy(cpa, "AWAY");
+    if (ri && ri->from[0]) snprintf(b, sizeof b, "%s>%s  %s", ri->from, ri->to, cpa);
+    else snprintf(b, sizeof b, "%s  %s", t.type[0] ? t.type : t.reg, cpa);
     frame.drawString(b, CX, 195);
     // overhead alert
     if (t.distKm < S.overheadAlertKm && !t.onGround) {

@@ -15,7 +15,8 @@ struct Track {
   // correction animation
   bool corrActive; uint32_t corrStart; double corrFromLat, corrFromLon;
   // trail of past display positions (lat/lon), ring buffer
-  float trLat[TRAIL_LEN], trLon[TRAIL_LEN]; uint8_t trHead, trCount; uint32_t trLast;
+  float trLat[TRAIL_LEN], trLon[TRAIL_LEN]; int16_t trAlt[TRAIL_LEN]; uint8_t trHead, trCount; uint32_t trLast;
+  uint8_t phase; char phaseAp[4];   // 0 enroute 1 arriving 2 departing, nearest airport IATA
   float distKm, bearingDeg;   // computed for current display position
 };
 
@@ -35,5 +36,7 @@ Track* adsbTracks();                    // MAX_TRACKS array (valid flag)
 const AdsbStats& adsbStats();
 void adsbLock(); void adsbUnlock();     // guard track array when reading from another core
 uint32_t adsbComputedInterval();
+// closest point of approach to the observer: returns true if approaching; tMin seconds, dMin km
+bool adsbClosestApproach(const Track& t, float& tMinS, float& dMinKm);
 void adsbClearOpenSkyToken();
 void adsbPause(bool on);                // e.g. during OTA upload

@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "input.h"
 
-enum ModeId : uint8_t { MODE_SKY = 0, MODE_CHRONO, MODE_ATMOS, MODE_ORBIT, MODE_SIGNAL, MODE_PULSE, MODE_COUNT };
+enum ModeId : uint8_t { MODE_SKY = 0, MODE_FLIGHT, MODE_CHRONO, MODE_ATMOS, MODE_ORBIT, MODE_SIGNAL, MODE_PULSE, MODE_COUNT };
 const char* modeName(uint8_t id);
 
 struct Mode {

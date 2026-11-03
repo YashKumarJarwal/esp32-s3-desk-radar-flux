@@ -22,3 +22,5 @@ backups/*.bin
 
 # generated from web/index.html by dev/embed_web.py
 firmware/include/web_index.h
+# downloaded geodata inputs (regenerate with: python3 -I dev/gen_geodata.py dev/geodata firmware/include/geo_data.h)
+dev/geodata/

@@ -10,6 +10,7 @@
 #include <esp_heap_caps.h>
 #include <base64.h>
 #include "auxdata.h"
+#include "geo.h"
 
 static Track* tracks;        // in PSRAM
 static AdsbStats stats;
@@ -83,6 +84,9 @@ static void applyFixes(Fix* fx, int n, uint32_t now) {
     }
     strncpy(t->callsign, f.cs, 8); strncpy(t->type, f.type, 4); strncpy(t->reg, f.reg, 8); strncpy(t->desc, f.desc, 23);
     t->lat = f.lat; t->lon = f.lon; t->altM = f.altM; t->speedMs = f.spd; t->headingDeg = f.hdg; t->vrateMs = f.vr; t->onGround = f.ground; t->tFix = now;
+    // phase: low and descending near an airport = arriving, low and climbing = departing
+    t->phase = 0; t->phaseAp[0] = 0;
+    if (!f.ground && f.altM < 3500 && fabsf(f.vr) > 1.5f) { const NearAirport* ap = geoNearestTo(f.lat, f.lon, 70); if (ap) { t->phase = f.vr < 0 ? 1 : 2; strlcpy(t->phaseAp, ap->iata[0] ? ap->iata : ap->icao, 4); } }
   }
   uint16_t active = 0; for (int k = 0; k < MAX_TRACKS; k++) if (tracks[k].valid) active++;
   stats.active = active;
@@ -200,6 +204,14 @@ void adsbBegin() {
   xTaskCreatePinnedToCore(task, "adsb", 12288, nullptr, 0, nullptr, 0);  // prio 0: shares the core with IDLE0 so the task watchdog stays fed
 }
 
+bool adsbClosestApproach(const Track& t, float& tMinS, float& dMinKm) {
+  float px = (t.dLon - S.lon) * cosf(S.lat * DEG_TO_RAD) * 111.32f, py = (t.dLat - S.lat) * 110.57f;   // km, east/north
+  float vx = sinf(t.headingDeg * DEG_TO_RAD) * t.speedMs / 1000.0f, vy = cosf(t.headingDeg * DEG_TO_RAD) * t.speedMs / 1000.0f;  // km/s
+  float vv = vx * vx + vy * vy; if (vv < 1e-9f) { tMinS = 0; dMinKm = sqrtf(px * px + py * py); return false; }
+  float tm = -(px * vx + py * vy) / vv; if (tm <= 0) { tMinS = 0; dMinKm = sqrtf(px * px + py * py); return false; }
+  float cx = px + vx * tm, cy = py + vy * tm; tMinS = tm; dMinKm = sqrtf(cx * cx + cy * cy); return true;
+}
+
 // Main-thread: dead-reckoning prediction, correction animation, trails, stale removal, distance/bearing.
 void adsbLoop() {
   static uint32_t last = 0; uint32_t now = millis(); float dt = (now - last) / 1000.0f; last = now; if (dt > 1) dt = 1;
@@ -217,7 +229,7 @@ void adsbLoop() {
       t.dLon += sinf(t.headingDeg * DEG_TO_RAD) * dKm / (111.32f * cosf(S.lat * DEG_TO_RAD));
     }
     t.distKm = kmBetween(S.lat, S.lon, t.dLat, t.dLon); t.bearingDeg = bearingTo(S.lat, S.lon, t.dLat, t.dLon);
-    if (now - t.trLast > 2000) { t.trLast = now; t.trLat[t.trHead] = t.dLat; t.trLon[t.trHead] = t.dLon; t.trHead = (t.trHead + 1) % TRAIL_LEN; if (t.trCount < TRAIL_LEN) t.trCount++; }
+    if (now - t.trLast > 2000) { t.trLast = now; t.trLat[t.trHead] = t.dLat; t.trLon[t.trHead] = t.dLon; t.trAlt[t.trHead] = (int16_t)min(t.altM, 32000.0f); t.trHead = (t.trHead + 1) % TRAIL_LEN; if (t.trCount < TRAIL_LEN) t.trCount++; }
   }
   adsbUnlock();
 }
