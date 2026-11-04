@@ -36,6 +36,7 @@ void setup() {
 void loop() {
   static uint32_t lastFrame = 0; static bool ntp = false;
   esp_task_wdt_reset();
+  inputService();
   netLoop(); webLoop(); serialCmdLoop();
   if (netOnline() && !ntp) { clockBegin(); ntp = true; }
   uint32_t now = millis();

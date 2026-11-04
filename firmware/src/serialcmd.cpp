@@ -16,7 +16,7 @@ void printSettingsSummary() {
 }
 
 static void help() {
-  Serial.println("Debug serial commands:\n  h: help\n  p: print settings\n  c: enter setup portal\n  x: exit setup portal (reboot)\n  q: toggle settings QR\n  w: show settings URL\n  u: switch UI theme\n  r: switch radar range\n  g: toggle ground traffic\n  o: cycle idle display\n  s: save settings\n  l: load settings\n  t: time/schedule status\n  m: device mode/state\n  a: API/auth status\n  A: clear OpenSky token\n  d: reset settings to default\n  b: reboot\n  n: next display mode\n  f: fetch now\n  1/2/3: virtual short/double/long press");
+  Serial.println("Debug serial commands:\n  h: help\n  p: print settings\n  c: enter setup portal\n  x: exit setup portal (reboot)\n  q: toggle settings QR\n  w: show settings URL\n  u: switch UI theme\n  r: switch radar range\n  g: toggle ground traffic\n  o: cycle idle display\n  s: save settings\n  l: load settings\n  t: time/schedule status\n  m: device mode/state\n  a: API/auth status\n  A: clear OpenSky token\n  d: reset settings to default\n  b: reboot\n  S<ssid>\\t<pass>: set WiFi over USB\n  n: next display mode\n  f: fetch now\n  1/2/3: virtual short/double/long press");
 }
 
 void serialCmdLoop() {
@@ -43,6 +43,11 @@ void serialCmdLoop() {
       case 'b': ESP.restart(); break;
       case 'n': modeSwitch((modeCurrent() + 1) % MODE_COUNT); break;
       case 'f': adsbRequestNow(); break;
+      case 'S': { // S<ssid>\t<password>\n : set WiFi over USB and restart
+        String line = Serial.readStringUntil('\n'); line.trim(); int tab = line.indexOf('\t');
+        if (tab < 0) { Serial.println("usage: S<ssid>\\t<password>"); break; }
+        S.ssid = line.substring(0, tab); S.wpass = line.substring(tab + 1); S.configured = true; settingsSave();
+        Serial.printf("wifi set: ssid=%s (pass %d chars), restarting\n", S.ssid.c_str(), S.wpass.length()); delay(200); ESP.restart(); break; }
       case '1': inputInject(Btn::Short); break;
       case '2': inputInject(Btn::Double); break;
       case '3': inputInject(Btn::Long); break;

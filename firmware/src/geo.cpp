@@ -43,14 +43,17 @@ void geoDrawRunways(void (*toXY)(double, double, float&, float&), uint16_t col, 
   }
 }
 bool geoProject(double lat, double lon, double lat0, double lon0, int cx, int cy, float R, float& x, float& y) {
-  double la = lat * DEG_TO_RAD, lo = lon * DEG_TO_RAD, la0 = lat0 * DEG_TO_RAD, lo0 = lon0 * DEG_TO_RAD;
-  double cosc = sin(la0) * sin(la) + cos(la0) * cos(la) * cos(lo - lo0);
-  x = cx + R * cos(la) * sin(lo - lo0); y = cy - R * (cos(la0) * sin(la) - sin(la0) * cos(la) * cos(lo - lo0));
+  float la = (float)lat * DEG_TO_RAD, lo = (float)lon * DEG_TO_RAD, la0 = (float)lat0 * DEG_TO_RAD, lo0 = (float)lon0 * DEG_TO_RAD;
+  float sla, cla, sla0, cla0, sdl, cdl; sincosf(la, &sla, &cla); sincosf(la0, &sla0, &cla0); sincosf(lo - lo0, &sdl, &cdl);
+  float cosc = sla0 * sla + cla0 * cla * cdl;
+  x = cx + R * cla * sdl; y = cy - R * (cla0 * sla - sla0 * cla * cdl);
   return cosc >= 0;
 }
 void geoDrawCoast(int cx, int cy, float R, double lat0, double lon0, uint16_t col) {
+  float limit = R * 1.5f + 240;   // skip rings whose first point projects far outside the frame when zoomed in
   for (int r = 0; r < GEO_COAST_RINGS; r++) {
     uint16_t start = pgm_read_word(&GEO_COAST_INDEX[r][0]), n = pgm_read_word(&GEO_COAST_INDEX[r][1]);
+    if (R > 400 && n < 40) { float fx, fy; geoProject((int16_t)pgm_read_word(&GEO_COAST[start][0]) / 100.0, (int16_t)pgm_read_word(&GEO_COAST[start][1]) / 100.0, lat0, lon0, cx, cy, R, fx, fy); if (fabsf(fx - cx) > limit || fabsf(fy - cy) > limit) continue; }
     float px = 0, py = 0; bool pv = false;
     for (int i = 0; i <= n; i++) {
       int k = start + (i % n); double la = (int16_t)pgm_read_word(&GEO_COAST[k][0]) / 100.0, lo = (int16_t)pgm_read_word(&GEO_COAST[k][1]) / 100.0;

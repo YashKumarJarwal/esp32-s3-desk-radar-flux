@@ -14,7 +14,7 @@ keeping every stock feature and adding modes, a modern bilingual dashboard, OTA,
 - `bridge/`    — PC bridge: `claude_hook.sh` (Claude Code hooks), `flux_bridge.py` + `plugins/` (spotify, github, system, command), `install.sh` (systemd user unit)
 
 ## Device
-- Dashboard: http://192.168.1.26/ (or http://flux.local/) — Overview, Radar, Display, Data, WiFi, Integrations, Advanced, System
+- Dashboard: http://flux-orb.local/ (or the IP shown on the boot screen) — Overview, Radar, Display, Data, WiFi, Integrations, Advanced, System
 - Button: short = next theme · double = next range · triple = next mode · long = settings QR · hold at power-on = setup hotspot
 - Modes: SKY (ADS-B radar with runways, arrival/departure chevrons, lock-on with route + closest approach) · FLIGHT (one aircraft: route arc on a zoomed coastline globe, big figures, altitude trace; short = next aircraft, double = page) · CHRONO (orbital clock) · ATMOS (weather + AQI) · ORBIT (ISS on a coastline globe) · SIGNAL (BLE/WiFi radar) · PULSE (integration cards)
 - Geo data: 2,911 airports / 4,165 runways (OurAirports) and Natural Earth 110m coastlines compiled into flash by `dev/gen_geodata.py` (inputs in `dev/geodata/`, not committed)
@@ -22,7 +22,7 @@ keeping every stock feature and adding modes, a modern bilingual dashboard, OTA,
 
 ## Push API (PULSE)
 ```
-curl -X POST http://192.168.1.26/api/pulse -H 'Content-Type: application/json' \
+curl -X POST http://flux-orb.local/api/pulse -H 'Content-Type: application/json' \
   -d '{"id":"demo","icon":"ai","title":"Hello","text":"from curl","style":"pulse","color":"#2dd4bf","overlay":true,"takeover":8,"ttl":60}'
 ```
 Fields: id, icon (ai|github|music|bell|check|warn|ci|dot), title, text, style (static|pulse|think|play), color (#rrggbb),

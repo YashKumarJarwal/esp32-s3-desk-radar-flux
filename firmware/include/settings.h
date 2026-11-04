@@ -8,7 +8,7 @@ struct Settings {
   // --- identity / wifi
   bool configured = false;
   String ssid, wpass;
-  String hostname = "flux";
+  String hostname = "flux-orb";
   // --- radar centre & ranges (stock: clat clon range rng0..2 fetchKm edgeDots)
   double lat = 28.64841, lon = 77.10935;
   float rangeKm = 60;                 // active display range

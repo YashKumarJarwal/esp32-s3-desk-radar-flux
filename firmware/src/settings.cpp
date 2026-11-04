@@ -69,7 +69,10 @@ bool settingsFromJson(const String& json, String& err) {
   JsonDocument d; auto e = deserializeJson(d, json);
   if (e) { err = e.c_str(); return false; }
   auto str = [&](const char* k, String& f, bool secret) { if (d[k].is<const char*>()) { String v = d[k].as<String>(); if (!(secret && v == "********")) f = v; } };
-  str("ssid", S.ssid, false); str("wpass", S.wpass, true); str("hostname", S.hostname, false);
+  // never let a blank SSID/password from a form wipe saved credentials; clearing is only via factory reset
+  { String v = d["ssid"].is<const char*>() ? d["ssid"].as<String>() : String(); if (v.length()) S.ssid = v; }
+  { String v = d["wpass"].is<const char*>() ? d["wpass"].as<String>() : String(); if (v.length() && v != "********") S.wpass = v; }
+  str("hostname", S.hostname, false);
   str("pulseToken", S.pulseToken, false); str("osUser", S.osUser, false); str("osPass", S.osPass, true); str("osClientId", S.osClientId, false); str("osClientSecret", S.osClientSecret, true);
   J_GET(d, "lat", lat, double); J_GET(d, "lon", lon, double); J_GET(d, "rangeKm", rangeKm, float);
   if (d["preset"].is<JsonArray>()) { int i = 0; for (JsonVariant v : d["preset"].as<JsonArray>()) { if (i < 3) S.preset[i++] = v.as<float>(); } }

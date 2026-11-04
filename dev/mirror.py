@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Fetch the device framebuffer (/screen.raw, RGB565) and save a PNG. Usage: mirror.py [host] [out.png] [--scale N]"""
 import sys, urllib.request, struct, zlib
-host = next((a for a in sys.argv[1:] if not a.endswith('.png') and not a.startswith('--') and not a.isdigit()), 'flux.local')
+host = next((a for a in sys.argv[1:] if not a.endswith('.png') and not a.startswith('--') and not a.isdigit()), 'flux-orb.local')
 out = next((a for a in sys.argv[1:] if a.endswith('.png')), '/home/flux/deskradar/dev/screen.png')
 scale = int(sys.argv[sys.argv.index('--scale') + 1]) if '--scale' in sys.argv else 2
 W = H = 240
