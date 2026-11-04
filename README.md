@@ -16,8 +16,8 @@ keeping every stock feature and adding modes, a modern bilingual dashboard, OTA,
 ## Device
 - Dashboard: http://flux-orb.local/ (or the IP shown on the boot screen) — Overview, Radar, Display, Data, WiFi, Integrations, Advanced, System
 - Button: short = next theme · double = next range · triple = next mode · long = settings QR · hold at power-on = setup hotspot
-- Modes: SKY (ADS-B radar with runways, arrival/departure chevrons, lock-on with route + closest approach) · FLIGHT (one aircraft: route arc on a zoomed coastline globe, big figures, altitude trace; short = next aircraft, double = page) · CHRONO (orbital clock) · ATMOS (weather + AQI) · ORBIT (ISS on a coastline globe) · SIGNAL (BLE/WiFi radar) · PULSE (integration cards)
-- Geo data: 2,911 airports / 4,165 runways (OurAirports) and Natural Earth 110m coastlines compiled into flash by `dev/gen_geodata.py` (inputs in `dev/geodata/`, not committed)
+- Modes: SKY (ADS-B radar with runways, arrival/departure chevrons, lock-on with route + closest approach) · FLIGHT (one aircraft, three pages: an animated 3D globe whose camera glides from departure to arrival with coastlines, borders, day/night shading, cities along the route and the country under the camera; big figures with closest approach; route itinerary listing every country crossed; short = next aircraft, double = page) · CHRONO (orbital clock) · ATMOS (weather + AQI) · ORBIT (ISS on a coastline globe) · SIGNAL (BLE/WiFi radar) · PULSE (integration cards)
+- Geo data: 2,911 airports / 4,165 runways (OurAirports), Natural Earth 110m coastlines, borders, 243 cities and 177 country outlines compiled into flash (~210 KB) by `dev/gen_geodata.py` (inputs in `dev/geodata/`, not committed)
 - Serial 115200: `h` for debug commands (`u` theme, `r` range, `n` next mode, `a` API status, `p` settings, `b` reboot, `1-4` virtual presses)
 
 ## Push API (PULSE)
