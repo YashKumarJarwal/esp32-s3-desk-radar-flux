@@ -19,7 +19,7 @@ echo "== Second read for verification"
 $ESPT --port "$PORT" --chip esp32s3 read_flash 0 "$SIZE" "$OUT.verify"
 if cmp -s "$OUT" "$OUT.verify"; then
   rm "$OUT.verify"
-  sha256sum "$OUT" > "$OUT.sha256"
+  (cd "$DIR" && sha256sum "$(basename "$OUT")" > "$(basename "$OUT").sha256")
   cp "$OUT" "$DIR/stock-full-LATEST.bin"; cp "$OUT.sha256" "$DIR/stock-full-LATEST.bin.sha256"
   echo "== BACKUP OK: $OUT"; cat "$OUT.sha256"
 else

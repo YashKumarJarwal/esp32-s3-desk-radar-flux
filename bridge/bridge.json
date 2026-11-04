@@ -1,6 +1,6 @@
 {
   "device": "http://flux-orb.local",
-  "fallback_device": "http://192.168.1.37",
+  "fallback_device": "",
   "token": "",
   "interval": 5,
   "plugins": {

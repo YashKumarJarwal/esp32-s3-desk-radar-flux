@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Live backup progress, refreshed every 0.01 s. Ctrl-C to quit.
-LOG=/home/flux/deskradar/backups/backup-run.log
+LOG="$(cd "$(dirname "$0")" && pwd)/backups/backup-run.log"
 TOTAL=4194304
 while true; do
   cur=$(grep -oE "[0-9]+ \([0-9]+ %\)" "$LOG" 2>/dev/null | tail -1 | cut -d' ' -f1)

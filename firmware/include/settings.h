@@ -10,7 +10,7 @@ struct Settings {
   String ssid, wpass;
   String hostname = "flux-orb";
   // --- radar centre & ranges (stock: clat clon range rng0..2 fetchKm edgeDots)
-  double lat = 28.64841, lon = 77.10935;
+  double lat = 51.4700, lon = -0.4543;   // default centre (Heathrow) until set in the dashboard
   float rangeKm = 60;                 // active display range
   float preset[3] = {30, 60, 120};    // presets cycled by double tap
   float fetchKm = 75;                 // API query range (clamped display..1.5x, <=300)

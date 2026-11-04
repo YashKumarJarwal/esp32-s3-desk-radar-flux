@@ -3,7 +3,7 @@
 # Reads the hook JSON on stdin, posts a PULSE card, never blocks Claude (short timeouts, always exit 0).
 EV="$1"; IN="$(cat 2>/dev/null)"
 CFG="$HOME/deskradar/bridge/bridge.json"
-DEV=$(jq -r '.device // "http://flux.local"' "$CFG" 2>/dev/null || echo "http://flux.local")
+DEV=$(jq -r '.device // "http://flux-orb.local"' "$CFG" 2>/dev/null || echo "http://flux-orb.local")
 TOK=$(jq -r '.token // ""' "$CFG" 2>/dev/null)
 tool=$(printf '%s' "$IN" | jq -r '.tool_name // ""' 2>/dev/null)
 msg=$(printf '%s' "$IN" | jq -r '.message // .notification_type // ""' 2>/dev/null | cut -c1-40)
