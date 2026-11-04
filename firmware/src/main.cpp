@@ -13,6 +13,7 @@
 #include <esp_task_wdt.h>
 #include "pulse.h"
 #include "auxdata.h"
+#include "globe.h"
 
 void setup() {
   Serial.begin(115200);
@@ -28,6 +29,7 @@ void setup() {
   adsbBegin();
   auxBegin();
   pulseBegin();
+  globeInit();
   modesBegin();
   printSettingsSummary();
   Serial.println("type h for help");
@@ -40,7 +42,7 @@ void loop() {
   netLoop(); webLoop(); serialCmdLoop();
   if (netOnline() && !ntp) { clockBegin(); ntp = true; }
   uint32_t now = millis();
-  if (now - lastFrame >= 33) { lastFrame = now; pulseTick(); modesLoop(); }
+  if (now - lastFrame >= 33) { lastFrame = now; pulseTick(); uint32_t t0 = micros(); modesLoop(); static uint32_t acc = 0, cnt = 0, tRep = 0; acc += micros() - t0; cnt++; if (S.serialDebug && now - tRep > 5000) { tRep = now; Serial.printf("[perf] frame avg %.1f ms (%u frames)\n", acc / 1000.0f / cnt, cnt); acc = cnt = 0; } }
   // OTA safety: once we have run 20 s and reached WiFi, declare this image good (cancels bootloader rollback)
   static bool marked = false;
   if (!marked && now > 20000 && netOnline()) { marked = true; esp_ota_mark_app_valid_cancel_rollback(); Serial.println("[ota] image marked valid"); }

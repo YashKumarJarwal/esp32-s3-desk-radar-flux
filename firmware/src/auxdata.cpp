@@ -73,6 +73,17 @@ const RouteInfo* auxRoute(const char* cs) {
   if (!pendingRoute[0]) strlcpy(pendingRoute, cs, sizeof pendingRoute);
   return nullptr;
 }
+// fonts are ASCII only: fold common accented letters, drop the rest
+static void asciiFold(char* s) {
+  char out[32]; int o = 0;
+  for (unsigned char* p = (unsigned char*)s; *p && o < (int)sizeof(out) - 1; p++) {
+    if (*p < 0x80) { out[o++] = *p; continue; }
+    if (*p == 0xC3 && p[1]) { unsigned char c = p[1]; p++; const char* m = (c >= 0xA0 && c <= 0xA5) ? "a" : (c >= 0xA8 && c <= 0xAB) ? "e" : (c >= 0xAC && c <= 0xAF) ? "i" : (c >= 0xB2 && c <= 0xB6) ? "o" : (c >= 0xB9 && c <= 0xBC) ? "u" : c == 0xA7 ? "c" : c == 0xB1 ? "n" : (c >= 0x80 && c <= 0x85) ? "A" : (c >= 0x88 && c <= 0x8B) ? "E" : (c >= 0x92 && c <= 0x96) ? "O" : (c >= 0x99 && c <= 0x9C) ? "U" : ""; if (*m) out[o++] = *m; continue; }
+    if (*p == 0xC4 || *p == 0xC5) { unsigned char c = p[1]; p++; const char* m = (*p == 0xC5 && (c == 0x9F || c == 0x9E)) ? "s" : (*p == 0xC4 && (c == 0x9F || c == 0x9E)) ? "g" : (*p == 0xC4 && c == 0xB1) ? "i" : ""; if (*m) out[o++] = *m; continue; }
+    if (*p >= 0xC0) { int extra = *p >= 0xF0 ? 3 : *p >= 0xE0 ? 2 : 1; p += extra; }
+  }
+  out[o] = 0; strcpy(s, out);
+}
 static void fetchRoute() {
   char cs[9]; strlcpy(cs, pendingRoute, sizeof cs);
   int slot = 0; uint32_t oldest = UINT32_MAX; for (int i = 0; i < ROUTE_CACHE; i++) if (!routes[i].valid) { slot = i; break; } else if (routes[i].at < oldest) { oldest = routes[i].at; slot = i; }
@@ -82,6 +93,7 @@ static void fetchRoute() {
     JsonObject fr = d["response"]["flightroute"];
     strlcpy(r.airline, fr["airline"]["name"] | "", sizeof r.airline); strlcpy(r.from, fr["origin"]["iata_code"] | "", sizeof r.from); strlcpy(r.to, fr["destination"]["iata_code"] | "", sizeof r.to);
     strlcpy(r.fromCity, fr["origin"]["municipality"] | "", sizeof r.fromCity); strlcpy(r.toCity, fr["destination"]["municipality"] | "", sizeof r.toCity);
+    asciiFold(r.airline); asciiFold(r.fromCity); asciiFold(r.toCity);
     r.fromLat = fr["origin"]["latitude"] | 0.0; r.fromLon = fr["origin"]["longitude"] | 0.0; r.toLat = fr["destination"]["latitude"] | 0.0; r.toLon = fr["destination"]["longitude"] | 0.0;
     if (S.serialDebug) Serial.printf("[aux] route %s: %s %s-%s\n", cs, r.airline, r.from, r.to);
   }

@@ -43,5 +43,52 @@ for ring in rings: idx.append((len(pts_all), len(ring))); pts_all.extend(ring)
 lines.append('#define GEO_COAST_RINGS %d' % len(idx)); lines.append('#define GEO_COAST_POINTS %d' % len(pts_all))
 lines.append('static const uint16_t GEO_COAST_INDEX[][2] PROGMEM = {' + ','.join('{%d,%d}' % i for i in idx) + '};')
 lines.append('static const int16_t GEO_COAST[][2] PROGMEM = {' + ','.join('{%d,%d}' % (round(la * 100), round(lo * 100)) for la, lo in pts_all) + '};')
+# borders (admin-0 land boundaries) as polylines, lightly simplified
+bj = json.load(open(src / 'ne_110m_admin_0_boundary_lines_land.json', encoding='utf-8'))
+blines = []
+for feat in bj['features']:
+    g = feat['geometry']; ls = g['coordinates'] if g['type'] == 'LineString' else [l for l in g['coordinates']]
+    if g['type'] == 'LineString': ls = [ls]
+    for line in ls:
+        pts = []; last = None
+        for lon, lat in line:
+            if last is None or math.hypot(lon - last[0], lat - last[1]) >= 0.25: pts.append((lat, lon)); last = (lon, lat)
+        if len(pts) >= 2: blines.append(pts)
+bpts = []; bidx = []
+for l in blines: bidx.append((len(bpts), len(l))); bpts.extend(l)
+lines.append('#define GEO_BORDER_LINES %d' % len(bidx)); lines.append('#define GEO_BORDER_POINTS %d' % len(bpts))
+lines.append('static const uint16_t GEO_BORDER_INDEX[][2] PROGMEM = {' + ','.join('{%d,%d}' % i for i in bidx) + '};')
+lines.append('static const int16_t GEO_BORDER[][2] PROGMEM = {' + ','.join('{%d,%d}' % (round(la * 100), round(lo * 100)) for la, lo in bpts) + '};')
+# cities: name, lat, lon, population
+cj = json.load(open(src / 'ne_110m_populated_places_simple.json', encoding='utf-8'))
+cities = []
+for feat in cj['features']:
+    pr = feat['properties']; lon, lat = feat['geometry']['coordinates']
+    name = (pr.get('name') or '').encode('ascii', 'ignore').decode()[:13]
+    if name: cities.append((name, lat, lon, int(pr.get('pop_max') or 0)))
+cities.sort(key=lambda c: -c[3])
+lines.append('struct GeoCity { int16_t lat, lon; uint32_t pop; char name[14]; };')
+lines.append('#define GEO_CITY_COUNT %d' % len(cities))
+lines.append('static const GeoCity GEO_CITIES[] PROGMEM = {' + ','.join('{%d,%d,%d,"%s"}' % (round(la * 100), round(lo * 100), pop, name.replace('"', '')) for name, la, lo, pop in cities) + '};')
+# countries: name + polygon rings (outer rings only) for point-in-polygon
+kj = json.load(open(src / 'ne_110m_admin_0_countries.json', encoding='utf-8'))
+cnames = []; crings = []; cpts = []
+for feat in kj['features']:
+    pr = feat['properties']; name = (pr.get('NAME') or '').encode('ascii', 'ignore').decode()[:15]
+    g = feat['geometry']; polys = g['coordinates'] if g['type'] == 'MultiPolygon' else [g['coordinates']]
+    r0 = len(crings)
+    for poly in polys:
+        ring = poly[0]; pts = []; last = None
+        for lon, lat in ring:
+            if last is None or math.hypot(lon - last[0], lat - last[1]) >= 0.2: pts.append((lat, lon)); last = (lon, lat)
+        if len(pts) >= 3: crings.append((len(cpts), len(pts))); cpts.extend(pts)
+    cnames.append((name, r0, len(crings) - r0))
+lines.append('struct GeoCountry { char name[16]; uint16_t ringStart, ringCount; };')
+lines.append('#define GEO_COUNTRY_COUNT %d' % len(cnames))
+lines.append('static const GeoCountry GEO_COUNTRIES[] PROGMEM = {' + ','.join('{"%s",%d,%d}' % c for c in cnames) + '};')
+lines.append('#define GEO_CRING_COUNT %d' % len(crings)); lines.append('#define GEO_CPT_COUNT %d' % len(cpts))
+lines.append('static const uint16_t GEO_CRINGS[][2] PROGMEM = {' + ','.join('{%d,%d}' % r for r in crings) + '};')
+lines.append('static const int16_t GEO_CPTS[][2] PROGMEM = {' + ','.join('{%d,%d}' % (round(la * 100), round(lo * 100)) for la, lo in cpts) + '};')
+print(f'borders {len(bidx)} lines {len(bpts)} pts; cities {len(cities)}; countries {len(cnames)} rings {len(crings)} pts {len(cpts)}')
 out.write_text('\n'.join(lines) + '\n')
 print(f'airports {len(ap_lines)}  runways {len(rwl)}  coast rings {len(idx)} points {len(pts_all)}  header {out.stat().st_size // 1024} KB')
